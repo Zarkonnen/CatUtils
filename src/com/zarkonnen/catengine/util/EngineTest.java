@@ -9,21 +9,14 @@ import com.zarkonnen.catengine.Frame;
 import com.zarkonnen.catengine.Game;
 import com.zarkonnen.catengine.Hook;
 import com.zarkonnen.catengine.Hooks;
+import com.zarkonnen.catengine.Img;
 import com.zarkonnen.catengine.Input;
 import static com.zarkonnen.catengine.util.Utils.*;
 import javax.swing.JOptionPane;
 
 public class EngineTest {
-	public static void main(String[] args) {
-		int choice = JOptionPane.showOptionDialog(null, "Choose an implementation.", "CatEngine!", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, EngineFactory.defaultEngines(), EngineFactory.defaultEngines()[0]);
-		if (choice == -1) { return; }
-		Engine e = null;
-		try {
-			e = EngineFactory.make(EngineFactory.defaultEngines()[choice], "CatEngine!", "/com/zarkonnen/catengine/images/", "/com/zarkonnen/catengine/sounds/", 30);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			return;
-		}
+	public static void main(String[] args) throws Exception {
+		Engine e = EngineFactory.make("SlickEngine", "CatEngine!", "/com/zarkonnen/catengine/images/", "/com/zarkonnen/catengine/sounds/", 30);
 		e.setup(new Game() {
 			Pt cursor = new Pt(0, 0);
 			int i = 0;
@@ -82,15 +75,17 @@ public class EngineTest {
 			public void render(Frame f) {
 				ScreenMode sm = f.mode();
 				Draw d = new Draw(f);
+				Img cat = new Img("cat.jpg");
+				Img nebula = new Img("nebula");
 				if (catness) {
-					d.blit("cat.jpg", null, 0, 0, sm.width, sm.height);
+					d.blit(cat, 0, 0, sm.width, sm.height);
 				} else {
 					d.rect(Clr.BLACK, 0, 0, sm.width, sm.height);
 				}
 				d.rect(Clr.RED, cursor.x, cursor.y, 10, 10, (Math.PI * 2 * i) / 100);
-				d.blit("cat.jpg", new Clr(0, 255, 0, i % 255), (i * 3) % sm.width, (i * 10) % sm.height, 0, 0, (Math.PI * 2 * i) / 1000);
+				d.blit(cat, new Clr(0, 255, 0, i % 255), (i * 3) % sm.width, (i * 10) % sm.height, 0, 0, (Math.PI * 2 * i) / 1000);
 				for (int j = 0; j < oodles; j++) {
-					d.blit("nebula.png", null, (i * 3 + j * 10) % sm.width, (i * 10 + j * 3) % sm.height);
+					d.blit(nebula, (i * 3 + j * 10) % sm.width, (i * 10 + j * 3) % sm.height);
 				}
 				String symbols = " qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-=+_!?<>,.;:\"'@£$%^&*()[]{}|\\~/±";
 				
@@ -105,7 +100,6 @@ public class EngineTest {
 						catness = true;
 					}
 				};
-				d.blit("LiberationMono18", 0, 0);
 				d.text("Welcome to CatEngine!\n[33" + green + green2 + "00]Meow.", fo, 100.0, 300.0, m(p("Meow.", hook)));
 				d.text("(Try moving your cursor over that \"Meow.\")", fo, 100, 400);
 				d.text(f.fps() + " FPS", fo, 10, 10);
