@@ -75,6 +75,9 @@ public class EngineTest {
 			public void render(Frame f) {
 				ScreenMode sm = f.mode();
 				Draw d = new Draw(f);
+				/*d.shift(sm.width / 2, sm.height / 2);
+				d.rotate((Math.PI * 2 * i) / 10);
+				d.shift(-sm.width / 2, -sm.height / 2);*/
 				Img cat = new Img("cat.jpg");
 				Img nebula = new Img("nebula");
 				if (catness) {
