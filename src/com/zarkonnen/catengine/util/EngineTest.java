@@ -90,24 +90,21 @@ public class EngineTest {
 				for (int j = 0; j < oodles; j++) {
 					d.blit(nebula, (i * 3 + j * 10) % sm.width, (i * 10 + j * 3) % sm.height);
 				}
-				String symbols = " qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890-=+_!?<>,.;:\"'@£$%^&*()[]{}|\\~/±";
-				
-				Fount fo = new Fount("Courier12", 10, 15, 8, 19, symbols);
-				d.text("Welcome to CatEngine!\n[RED]Meow.", fo, 100, 100);
-				fo = new Fount("LiberationMono18", 14, 24, 12, 26, symbols);
-				String green = "" + (i / 10) % 10;
-				String green2 = "" + i % 10;
-				Hook hook = new Hook(Hook.Type.HOVER) {
-					@Override
-					public void run(Input in, Pt p, Hook.Type type) {
-						catness = true;
+
+				try {
+					Fount fo = Fount.fromResource("courier12", "/com/zarkonnen/catengine/images/courier12");
+					d.text("Welcome to CatEngine!\n[RED]Meow.", fo, 100, 100);
+					fo = Fount.fromResource("libserif12", "/com/zarkonnen/catengine/images/libserif12");
+					String green = "" + (i / 10) % 10;
+					String green2 = "" + i % 10;
+					d.text("Welcome to CatEngine!\n[33" + green + green2 + "00]Meow.", fo, 100.0, 300.0);
+					d.text("(Try moving your cursor over that \"Meow.\")", fo, 100, 400);
+					d.text(f.fps() + " FPS", fo, 10, 10);
+					if (oodles > 0) {
+						d.text("[bg=BLACK][WHITE]oodles=" + oodles, fo, 10, 30);
 					}
-				};
-				d.text("Welcome to CatEngine!\n[33" + green + green2 + "00]Meow.", fo, 100.0, 300.0, m(p("Meow.", hook)));
-				d.text("(Try moving your cursor over that \"Meow.\")", fo, 100, 400);
-				d.text(f.fps() + " FPS", fo, 10, 10);
-				if (oodles > 0) {
-					d.text("[bg=BLACK][WHITE]oodles=" + oodles, fo, 10, 30);
+				} catch (Exception e) {
+					e.printStackTrace();
 				}
 				hooks = d.getHooks();
 			}
