@@ -21,7 +21,7 @@ import javax.imageio.ImageIO;
 public class FountGen {
 	public static void main(String[] args)throws Exception {
 		if (args.length != 9 && args.length != 13 && args.length != 15) {
-			System.out.println("Params: alphabetFile font (plain|bold|italic) size pretty imgSize targetPNGFile targetLayoutFile yOffset [secondaryAlphabet font (plain|bold|italic) size [leftExtra rightExtra]]");
+			System.out.println("Params: alphabetFile font (plain|bold|italic) size pretty imgSize targetPNGFile targetLayoutFile yOffset[,extraLineH] [secondaryAlphabet font (plain|bold|italic) size [leftExtra rightExtra]]");
 			return;
 		}
 				
@@ -52,14 +52,25 @@ public class FountGen {
 		g.setColor(Color.WHITE);
 		g.setFont(font);
 		
-		int yOffset = Integer.parseInt(args[8]);
+		FontMetrics fm = g.getFontMetrics(font);
+		
+		int yOffset = 0;
+		int maxH = fm.getHeight();
+		int extraLineH = 0;
+		if (args[8].contains(",")) {
+			yOffset = Integer.parseInt(args[8].split(",")[0]);
+			extraLineH = Integer.parseInt(args[8].split(",")[1]);
+		} else {
+			yOffset = Integer.parseInt(args[8]);
+		}
+		
+		//System.out.println(font + " " + args[3] + ": yOffset " + yOffset + " extraLineH " + extraLineH);
 		
 		int x = 1 + leftExtra;
 		int y = 1;
 		
-		FontMetrics fm = g.getFontMetrics(font);
 		int maxAscent = fm.getMaxAscent();
-		int maxH = fm.getHeight();
+		
 		
 		Font font2 = font;
 		FontMetrics fm2 = fm;
@@ -67,17 +78,17 @@ public class FountGen {
 		String alphabet2 = "";
 		
 		if (args.length == 13 || args.length == 15) {
-			r = new BufferedReader(new InputStreamReader(new FileInputStream(args[8]), "UTF-8"));
+			r = new BufferedReader(new InputStreamReader(new FileInputStream(args[9]), "UTF-8"));
 			alphabet2 = r.readLine();
 			r.close();
 			
-			font2 = new Font(args[8],
-				args[9].equals("italic")
+			font2 = new Font(args[10],
+				args[10].equals("italic")
 					? Font.ITALIC
-					: args[10].equals("bold")
+					: args[11].equals("bold")
 						? Font.BOLD
 						: Font.PLAIN,
-				Integer.parseInt(args[11]));
+				Integer.parseInt(args[12]));
 			g.setFont(font2);
 			fm2 = g.getFontMetrics(font2);
 			maxAscent2 = fm2.getMaxAscent();
@@ -99,9 +110,9 @@ public class FountGen {
 				int charW = fm2.stringWidth(charS);
 				if (x + charW + rightExtra > imgSize) {
 					x = 1 + leftExtra;
-					y += maxH + 1 + yOffset;
+					y += maxH + 1 + yOffset + extraLineH;
 				}
-				g.drawString(charS, x, y + maxAscent / 2 + maxAscent2 / 2 + yOffset);
+				g.drawString(charS, x, y + maxAscent + yOffset);
 				info.append(charS).append("\n");
 				info.append(x - leftExtra).append(" ").append(y).append(" ").append(charW + leftExtra + rightExtra).append(" ").append(maxH + yOffset).append("\n");
 				x += charW + 1 + rightExtra + leftExtra;
@@ -110,7 +121,7 @@ public class FountGen {
 				int charW = fm.stringWidth(charS);
 				if (x + charW + rightExtra > imgSize) {
 					x = 1 + leftExtra;
-					y += maxH + 1 + yOffset;
+					y += maxH + 1 + yOffset + extraLineH;
 				}
 				g.drawString(charS, x, y + maxAscent + yOffset);
 				info.append(charS).append("\n");

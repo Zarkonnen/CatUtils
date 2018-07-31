@@ -3,6 +3,9 @@ package com.zarkonnen.catengine.util;
 import com.zarkonnen.catengine.util.SpikeProfiler.Entry;
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -179,6 +182,12 @@ public class LogViewer extends JFrame {
 		tree.setCellRenderer(new Renderer());
 		setSize(800, 800);
 		setLocationRelativeTo(null);
-		//setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		/*addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosed(WindowEvent we) {
+				open(null);
+			}
+		});*/
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
