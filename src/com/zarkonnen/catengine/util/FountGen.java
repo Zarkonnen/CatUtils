@@ -16,6 +16,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.HashMap;
 import javax.imageio.ImageIO;
 
 public class FountGen {
@@ -76,11 +77,11 @@ public class FountGen {
 		FontMetrics fm2 = fm;
 		int maxAscent2 = maxAscent;
 		String alphabet2 = "";
+		HashMap<String, String> remaps = new HashMap<String, String>();
 		
 		if (args.length == 13 || args.length == 15) {
 			r = new BufferedReader(new InputStreamReader(new FileInputStream(args[9]), "UTF-8"));
-			alphabet2 = r.readLine();
-			r.close();
+			alphabet2 = r.readLine();			
 			
 			font2 = new Font(args[10],
 				args[10].equals("italic")
@@ -92,6 +93,16 @@ public class FountGen {
 			g.setFont(font2);
 			fm2 = g.getFontMetrics(font2);
 			maxAscent2 = fm2.getMaxAscent();
+			
+			String l = null;
+			while ((l = r.readLine()) != null) {
+				if (l.startsWith("remap ")) {
+					String from = l.substring(6, 7);
+					String to = l.substring(7, 8);
+					remaps.put(from, to);
+				}
+			}
+			r.close();
 		}
 		
 		StringBuilder info = new StringBuilder();
@@ -104,26 +115,30 @@ public class FountGen {
 		
 		for (char c : alphabet.toCharArray()) {
 			String charS = new String(new char[] {c});
+			String drawS = charS;
+			if (remaps.containsKey(charS)) {
+				drawS = remaps.get(charS);
+			}
 			
 			if (alphabet2.contains(charS)) {
 				g.setFont(font2);
-				int charW = fm2.stringWidth(charS);
+				int charW = fm2.stringWidth(drawS);
 				if (x + charW + rightExtra > imgSize) {
 					x = 1 + leftExtra;
 					y += maxH + 1 + yOffset + extraLineH;
 				}
-				g.drawString(charS, x, y + maxAscent + yOffset);
+				g.drawString(drawS, x, y + maxAscent + yOffset);
 				info.append(charS).append("\n");
 				info.append(x - leftExtra).append(" ").append(y).append(" ").append(charW + leftExtra + rightExtra).append(" ").append(maxH + yOffset).append("\n");
 				x += charW + 1 + rightExtra + leftExtra;
 			} else {
 				g.setFont(font);
-				int charW = fm.stringWidth(charS);
+				int charW = fm.stringWidth(drawS);
 				if (x + charW + rightExtra > imgSize) {
 					x = 1 + leftExtra;
 					y += maxH + 1 + yOffset + extraLineH;
 				}
-				g.drawString(charS, x, y + maxAscent + yOffset);
+				g.drawString(drawS, x, y + maxAscent + yOffset);
 				info.append(charS).append("\n");
 				info.append(x - leftExtra).append(" ").append(y).append(" ").append(charW + leftExtra + rightExtra).append(" ").append(maxH + yOffset).append("\n");
 				x += charW + 1 + rightExtra + leftExtra;
